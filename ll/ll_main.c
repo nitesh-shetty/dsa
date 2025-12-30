@@ -52,13 +52,26 @@
 int feat_implemented = 0;
 int feat_total = 36;
 
-void print_info(char *test)
+void print_app_info(char *test)
 {
-	printf("%s, features completion [%d/%d]\n", test, feat_implemented, feat_total);
+	printf("linked list manipulation\n");
+	printf("%s: command option value\n", test);
+	printf("%s: insert head value\n", test);
+	printf("%s: features completion [%d/%d], %d%\n", test, feat_implemented, feat_total, (feat_implemented*100)/feat_total);
+	printf("sample:\n");
+	printf("%s insert head 44\n", test);
+}
+
+int parse_args(int argc, void *argv[])
+{
+	print_app_info(argv[0]);	
+	return 0;
 }
 
 int main(int argc, void *argv[])
 {
-	print_info(argv[0]);	
+	if (parse_args(argc, argv))
+		return 1;
+
 	return 0;
 }
