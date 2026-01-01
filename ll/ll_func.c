@@ -29,11 +29,12 @@ void insert_head(struct node **head, struct node *node)
 
 void insert_index(struct node **head, struct node *node, int i)
 {
-	struct node *cur, *prev;	
+	struct node *cur;	
 
 	if (!*head) {
 		if (i>0) {
 			printf("[Error: Index out of bound]\n");
+			return;
 		}
 		*head = node;
 		return;
@@ -47,21 +48,16 @@ void insert_index(struct node **head, struct node *node, int i)
 	}
 
 	cur = *head;
-	prev = NULL;
 
-	// find the (i)th node
-	while(cur->next && i--) {
-		prev = cur;
+	// find the (i-1)th node
+	while(--i && cur && cur->next)
 		cur = cur->next;
-	}
 	
-	if (i>2) {
-		printf("[Error: Index out of bound]\n");
-	} else if (i==1) {
+	if (i) {
 		printf("[Error: Index out of bound]\n");
 	} else {
-		prev->next = node; // (i-1)th->next = node 
-		node->next = cur; // node->next = (i)th_node 
+		node->next = cur->next;
+		cur->next = node;
 	}
 }
 
