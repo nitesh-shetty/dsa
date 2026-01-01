@@ -89,64 +89,109 @@ void print_app_info(char *app_name)
 		(feat_implemented*100)/feat_total);
 }
 
-int parse_value(int argc, char *argv[], struct options *op)
-{
-	long value;
-	char *end;
-
-	value = strtol(argv[1], &end, 10);
-	if (*end != '\0') {
-		printf("[Invalid value]\n");
-		return RET_FAILURE;
-	}
-	op->value = value;
-
-	return RET_SUCCESS;
-}
-
-int parse_insert(int argc, char *argv[], struct options *op)
-{
-	int ret = RET_SUCCESS;
-
-	if (!strcmp(argv[1], "head")) {
-		op->sub_cmd = INSERT_HEAD;
-		ret = parse_value(argc - 1, argv + 1, op);
-	} else if (!strcmp(argv[1], "tail")) {
-		op->sub_cmd = INSERT_TAIL;
-		ret = parse_value(argc - 1, argv + 1, op);
-	} else {
-		printf(" [Undefined sub_command]\n");
-		ret = RET_FAILURE;
-	}
-	
-	return ret;
-}
-int parse_args(int argc, char *argv[], struct options *op)
-{
-	int ret = RET_SUCCESS;
-
-	if (!strcmp(argv[1], "insert")) {
-		op->cmd = CMD_INSERT;
-		ret = parse_insert(argc - 1, argv + 1, op);
-	} else {
-		printf("[Undefined command]\n");
-		ret = RET_FAILURE;
-	}
-	
-	return ret;
-}
-
 void print_options(struct options *op) {
 	printf("command: \t%d\n", op->cmd);
 	printf("sub command: \t%d\n", op->sub_cmd);
 	printf("value: \t\t%ld\n", op->value);
 }
 
+int parse_value(struct options *op)
+{
+	long value;
+	char *end;
+	char user_input[16];
+	int ret;
+
+	do {
+		printf("Please enter value:\n");
+		printf("value exit\n");
+		scanf("%s", user_input);
+		printf("input: %s\n", user_input);
+		if (!strcmp(user_input, "exit")) {
+			ret = RET_FAILURE;
+			break;
+		}
+		value = strtol(user_input, &end, 10);
+		if (*end != '\0') {
+			printf("[Invalid value]\n");
+		} else  {
+			op->value = value;
+			break;
+		}
+	} while(1);
+
+	return RET_SUCCESS;
+}
+
+int parse_insert(struct options *op)
+{
+	int ret = RET_SUCCESS;
+	char user_input[16];
+
+	do {
+		printf("Please enter sub command:\n");
+		printf("head tail exit\n");
+		scanf("%s", user_input);
+		printf("input: %s\n", user_input);
+
+		if (!strcmp(user_input, "head")) {
+			op->sub_cmd = INSERT_HEAD;
+			ret = parse_value(op);
+			break;
+		} else if (!strcmp(user_input, "tail")) {
+			op->sub_cmd = INSERT_TAIL;
+			ret = parse_value(op);
+			break;
+		} else if (!strcmp(user_input, "exit")) {
+			ret = RET_FAILURE;
+			break;
+		} else {
+			printf(" [Undefined sub_command]\n");
+			ret = RET_FAILURE;
+		}
+	} while(1);
+	
+	return ret;
+}
+
+int parse_args(struct options *op)
+{
+	int ret = RET_SUCCESS;
+	char user_input[16];
+
+	do {
+		printf("Please enter command:\n");
+		printf("insert remove len exit\n");
+		scanf("%s", user_input);
+		printf("input: %s\n", user_input);
+
+		if (!strcmp(user_input, "insert")) {
+			op->cmd = CMD_INSERT;
+			ret = parse_insert(op);
+			if (!ret)
+				print_options(op);
+		} else if (!strcmp(user_input, "remove")) {
+			op->cmd = CMD_REMOVE;
+		} else if (!strcmp(user_input, "len")) {
+			op->cmd = CMD_LEN;
+		} else if (!strcmp(user_input, "exit")) {
+			ret = RET_FAILURE;
+			break;
+		} else {
+			printf("[Undefined command]\n");
+			ret = RET_FAILURE;
+		}
+	} while (1);
+	
+	return ret;
+}
+
 int main(int argc, char *argv[])
 {
 	struct options op;
+	struct node *head;
 
-	if (parse_args(argc, argv, &op)) {
+	if (parse_args(&op)) {
 		print_app_info(argv[0]);
 		return RET_FAILURE;
 	}

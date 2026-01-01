@@ -1,6 +1,6 @@
 #include "ll.h"
 
-int insert_head(struct ll_info *ll_info)
+int insert_head(struct node *head, struct node *node)
 {
 	return 0;
 }

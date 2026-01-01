@@ -1,11 +1,11 @@
-struct ll {
-	struct ll *next;
-	struct ll *prev;
-	int data;
+struct node {
+	struct node *next;
+	struct node *prev;
+	long value;
 };
 
 struct ll_info {
-	struct ll *head;
+	struct node *head;
 };
 
-int insert_head(struct ll_info *ll_info);
+int insert_head(struct node *head, struct node *node);
