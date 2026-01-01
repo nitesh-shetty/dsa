@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include "ll.h"
 
 // Singly Linked List
@@ -52,26 +54,103 @@
 int feat_implemented = 0;
 int feat_total = 36;
 
-void print_app_info(char *test)
+enum status {
+	RET_SUCCESS,
+	RET_FAILURE,
+};
+
+enum command {
+	CMD_INSERT,
+	CMD_REMOVE,
+	CMD_LEN,
+};
+
+enum sub_command {
+	INSERT_HEAD,
+	INSERT_TAIL,
+};
+
+struct options {
+	enum command cmd;
+	enum sub_command sub_cmd;
+	long value;
+};
+
+void print_app_info(char *app_name)
 {
-	printf("linked list manipulation\n");
-	printf("%s: command option value\n", test);
-	printf("%s: insert head value\n", test);
-	printf("%s: features completion [%d/%d], %d%\n", test, feat_implemented, feat_total, (feat_implemented*100)/feat_total);
+	printf("\nlinked list manipulation\n");
+	printf("%s command sub_command value\n\n", app_name);
+	printf("Supported options\n");
+	printf("%s insert head value\n", app_name);
 	printf("sample:\n");
-	printf("%s insert head 44\n", test);
+	printf("%s insert head 44\n", app_name);
+	printf("%s: features completion [%d/%d], %d%\n", app_name,
+		feat_implemented, feat_total,
+		(feat_implemented*100)/feat_total);
 }
 
-int parse_args(int argc, void *argv[])
+int parse_value(int argc, char *argv[], struct options *op)
 {
-	print_app_info(argv[0]);	
-	return 0;
+	long value;
+	char *end;
+
+	value = strtol(argv[1], &end, 10);
+	if (*end != '\0') {
+		printf("[Invalid value]\n");
+		return RET_FAILURE;
+	}
+	op->value = value;
+
+	return RET_SUCCESS;
 }
 
-int main(int argc, void *argv[])
+int parse_insert(int argc, char *argv[], struct options *op)
 {
-	if (parse_args(argc, argv))
-		return 1;
+	int ret = RET_SUCCESS;
+
+	if (!strcmp(argv[1], "head")) {
+		op->sub_cmd = INSERT_HEAD;
+		ret = parse_value(argc - 1, argv + 1, op);
+	} else if (!strcmp(argv[1], "tail")) {
+		op->sub_cmd = INSERT_TAIL;
+		ret = parse_value(argc - 1, argv + 1, op);
+	} else {
+		printf(" [Undefined sub_command]\n");
+		ret = RET_FAILURE;
+	}
+	
+	return ret;
+}
+int parse_args(int argc, char *argv[], struct options *op)
+{
+	int ret = RET_SUCCESS;
+
+	if (!strcmp(argv[1], "insert")) {
+		op->cmd = CMD_INSERT;
+		ret = parse_insert(argc - 1, argv + 1, op);
+	} else {
+		printf("[Undefined command]\n");
+		ret = RET_FAILURE;
+	}
+	
+	return ret;
+}
+
+void print_options(struct options *op) {
+	printf("command: \t%d\n", op->cmd);
+	printf("sub command: \t%d\n", op->sub_cmd);
+	printf("value: \t\t%ld\n", op->value);
+}
+
+int main(int argc, char *argv[])
+{
+	struct options op;
+
+	if (parse_args(argc, argv, &op)) {
+		print_app_info(argv[0]);
+		return RET_FAILURE;
+	}
+	print_options(&op);
 
 	return 0;
 }
