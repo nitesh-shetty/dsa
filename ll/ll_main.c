@@ -4,19 +4,19 @@
 
 // Singly Linked List
 // Insert a node at:
-// beginning
-// end
-// given position
+// 1. beginning
+// 2. end
+// 3. given position
 // Delete a node by:
-// value
-// position
+// 4. value
+// 5. position
 // Traverse a linked list
-// Find the length of a linked list
-// Search an element in a linked list
-// Reverse a linked list (iterative & recursive)
-// Find the middle of a linked list
-// Detect a loop (cycle detection)
-// Find the nth node from the end
+// 6. Find the length of a linked list
+// 7.Search an element in a linked list
+// 8. Reverse a linked list (iterative & recursive)
+// 9.Find the middle of a linked list
+// 10. Detect a loop (cycle detection)
+// 11. Find the nth node from the end
 //
 // Doubly Linked List
 // Insert and delete nodes
@@ -50,8 +50,8 @@
 // Convert linked list to BST
 // LRU Cache using linked list + hashmap
 
-int feat_implemented = 0;
-int feat_total = 36;
+int feat_implemented = 3;
+int feat_total = 11;
 
 void print_app_info(void)
 {
@@ -69,11 +69,36 @@ void print_options(struct options *op) {
 	printf("---------------------\n");
 }
 
-int init_node(
-	struct node *node, struct node *prev, struct node *next, long value)
-{
+void print_list(struct node *head) {
+	struct node *node = head;
+	printf("list: ");
+	while (node != NULL) {
+		printf("->%ld", node->value);
+		node = node->next;
+	}
+	printf("\n");
+}
 
-	return RET_SUCCESS;
+struct node * init_node(long value)
+{
+	struct node *node = (struct node *) malloc(sizeof(struct node *));
+
+	node->next = NULL;
+	node->value = value;
+
+	return node;
+}
+
+void cleanup_list(struct node *head) {
+	struct node *node = head;
+	struct node *next;
+
+	while (node != NULL) {
+		next = node->next;
+		print_list(node);
+		free(node);
+		node = next;
+	}
 }
 
 int parse_value(struct options *op)
@@ -105,16 +130,43 @@ int parse_value(struct options *op)
 	return ret;
 }
 
-int parse_insert(struct options *op)
+int parse_index(struct options *op)
+{
+	long index;
+	char *end;
+	char user_input[16];
+	int ret;
+
+	do {
+		printf("Please enter index:\n");
+		printf("index exit\n");
+		scanf("%s", user_input);
+		if (!strcmp(user_input, "exit")) {
+			ret = RET_FAILURE;
+			break;
+		}
+		index = strtol(user_input, &end, 10);
+		if (*end != '\0') {
+			printf("[Invalid value]\n");
+		} else  {
+			op->index = index;
+			ret = parse_value(op);
+			break;
+		}
+	} while(1);
+
+	return ret;
+}
+
+void parse_insert(struct node **head, struct options *op)
 {
 	int ret = RET_SUCCESS;
 	char user_input[16];
 
 	do {
 		printf("Please enter sub command:\n");
-		printf("head tail exit\n");
+		printf("head tail index exit\n");
 		scanf("%s", user_input);
-		// printf("input: %s\n", user_input);
 
 		if (!strcmp(user_input, "head")) {
 			op->sub_cmd = INSERT_HEAD;
@@ -123,6 +175,10 @@ int parse_insert(struct options *op)
 		} else if (!strcmp(user_input, "tail")) {
 			op->sub_cmd = INSERT_TAIL;
 			ret = parse_value(op);
+			break;
+		} else if (!strcmp(user_input, "index")) {
+			op->sub_cmd = INSERT_INDEX;
+			ret = parse_index(op);
 			break;
 		} else if (!strcmp(user_input, "exit")) {
 			ret = RET_FAILURE;
@@ -133,31 +189,26 @@ int parse_insert(struct options *op)
 		}
 	} while(1);
 	
-	return ret;
+	if (!ret)
+		insert(head, op);	
 }
 
-int process_ll(struct options *op)
+void process_ll(struct options *op)
 {
-	int ret = RET_SUCCESS;
 	char user_input[16];
-	struct head;
-
-
+	struct node *head = NULL;
 
 	do {
+		printf("--------------------------------\n");
+		print_list(head);
 		printf("--------------------------------\n");
 		printf("Please enter command:\n");
 		printf("insert remove len info exit\n");
 		scanf("%s", user_input);
-		// printf("input: %s\n", user_input);
 
 		if (!strcmp(user_input, "insert")) {
 			op->cmd = CMD_INSERT;
-			ret = parse_insert(op);
-			if (!ret) {
-				print_options(op);
-				// insert_head(op);	
-			}
+			parse_insert(&head, op);
 		} else if (!strcmp(user_input, "remove")) {
 			op->cmd = CMD_REMOVE;
 		} else if (!strcmp(user_input, "len")) {
@@ -170,8 +221,7 @@ int process_ll(struct options *op)
 			printf("[Undefined command]\n");
 		}
 	} while (1);
-	
-	return ret;
+	cleanup_list(head);
 }
 
 int main(int argc, char *argv[])
