@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "ll.h"
@@ -54,28 +53,6 @@
 int feat_implemented = 0;
 int feat_total = 36;
 
-enum status {
-	RET_SUCCESS,
-	RET_FAILURE,
-};
-
-enum command {
-	CMD_INSERT,
-	CMD_REMOVE,
-	CMD_LEN,
-};
-
-enum sub_command {
-	INSERT_HEAD,
-	INSERT_TAIL,
-};
-
-struct options {
-	enum command cmd;
-	enum sub_command sub_cmd;
-	long value;
-};
-
 void print_app_info(void)
 {
 	printf("\nlinked list manipulation\n");
@@ -90,6 +67,13 @@ void print_options(struct options *op) {
 	printf("sub command: \t%d\n", op->sub_cmd);
 	printf("value: \t\t%ld\n", op->value);
 	printf("---------------------\n");
+}
+
+int init_node(
+	struct node *node, struct node *prev, struct node *next, long value)
+{
+
+	return RET_SUCCESS;
 }
 
 int parse_value(struct options *op)
@@ -156,6 +140,9 @@ int process_ll(struct options *op)
 {
 	int ret = RET_SUCCESS;
 	char user_input[16];
+	struct head;
+
+
 
 	do {
 		printf("--------------------------------\n");
@@ -167,8 +154,10 @@ int process_ll(struct options *op)
 		if (!strcmp(user_input, "insert")) {
 			op->cmd = CMD_INSERT;
 			ret = parse_insert(op);
-			if (!ret)
+			if (!ret) {
 				print_options(op);
+				// insert_head(op);	
+			}
 		} else if (!strcmp(user_input, "remove")) {
 			op->cmd = CMD_REMOVE;
 		} else if (!strcmp(user_input, "len")) {
